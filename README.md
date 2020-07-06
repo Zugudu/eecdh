@@ -8,7 +8,7 @@ Utility for manual use EECDH protocol. You can use this utility if you need to m
  * -n name — set output file name
 # Plans
  * [x] Add EEC key generation and saving
- * [ ] Add key importing from file
- * [ ] Add key importing from stdin
- * [ ] Add EECDH (_plans to use SHA256 as hash_)
+ * [x] Add key importing
+ * [x] Add ECDH
+ * [ ] Add HKDF with SHA256 v2
  * [ ] Add ChaCha20+Poly1305

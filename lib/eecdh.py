@@ -6,8 +6,12 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
+from cryptography.hazmat.backends.interfaces import PEMSerializationBackend
+from cryptography.hazmat.primitives.asymmetric.ec import ECDH
 
-def gen_key(file='key',o_type='PEM'):
+def gen_key(file,o_type='PEM'):
     key=X25519PrivateKey.generate()
     if(file==''):
         file='key'
@@ -24,4 +28,24 @@ def gen_key(file='key',o_type='PEM'):
         fd.write(private)
     with open(file+'.pub','wb') as fd:
         fd.write(pub)
-    print('Key',file,'was generated in',o_type,'format')
+    print('Key',file+'[.pub] was generated in',o_type,'format')
+def ecdh(key,peer_key,file,type):
+    if(key==''):
+        key='key'
+    if(peer_key==''):
+        print('Peer public key doesn\'t specified')
+        return
+    if(file==''):
+        file='shared_key'
+    if(type!='PEM'):
+        print('Invalid key format')
+    try:
+        with open(key,'rb') as fd:
+            pkey=load_pem_private_key(fd.read(),None,default_backend())
+        with open(peer_key,'rb') as fd:
+            pub=load_pem_public_key(fd.read(),default_backend())
+        with open(file,'wb') as fd:
+            fd.write(pkey.exchange(pub))
+        print('Shared key was wrote in',file)
+    except FileNotFoundError as e:
+        print(e)
