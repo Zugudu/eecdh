@@ -27,7 +27,7 @@ if __name__=='__main__':
 -dh public_key\t— computate sahred key with EECDH and save to *share_key*\n\
 -g\t\t— generate key\'s pair and save it\n\
 -h\t\t— help page\n\
--t [PEM|DER]\t\t— set output key type\n\
+-t [PEM|DER]\t— set output key type\n\
 -n name\t\t— set output file name')
     elif(action==1):
         print('Key generation...')
