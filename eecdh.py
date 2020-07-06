@@ -9,14 +9,19 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 def gen_key(file='key',o_type='PEM'):
     key=X25519PrivateKey.generate()
-
+    if(file==''):
+        file='key'
     if(o_type=='PEM'):
         private=key.private_bytes(Encoding.PEM,PrivateFormat.PKCS8,serialization.NoEncryption())
         pub=key.public_key().public_bytes(Encoding.PEM,PublicFormat.SubjectPublicKeyInfo)
-    else:
-        private=key.private_bytes(Encoding.DER,Encoding.PKCS8,serialization.NoEncryption())
+    elif(o_type=='DER'):
+        private=key.private_bytes(Encoding.DER,PrivateFormat.PKCS8,serialization.NoEncryption())
         pub=key.public_key().public_bytes(Encoding.DER,PublicFormat.SubjectPublicKeyInfo)
+    else:
+        print('Invalid output format')
+        return
     with open(file,'wb') as fd:
         fd.write(private)
     with open(file+'.pub','wb') as fd:
         fd.write(pub)
+    print('Key',file,'was generated in',o_type,'format')
