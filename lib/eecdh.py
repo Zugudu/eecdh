@@ -29,23 +29,35 @@ def gen_key(file,o_type='PEM'):
     with open(file+'.pub','wb') as fd:
         fd.write(pub)
     print('Key',file+'[.pub] was generated in',o_type,'format')
-def ecdh(key,peer_key,file,type):
+def get_ecdh(key,peer_key,type):
     if(key==''):
         key='key'
     if(peer_key==''):
         print('Peer public key doesn\'t specified')
         return
-    if(file==''):
-        file='shared_key'
     if(type!='PEM'):
         print('Invalid key format')
+        return
     try:
         with open(key,'rb') as fd:
             pkey=load_pem_private_key(fd.read(),None,default_backend())
         with open(peer_key,'rb') as fd:
             pub=load_pem_public_key(fd.read(),default_backend())
+        return pkey.exchange(pub)
+    except FileNotFoundError as e:
+        print(e)
+def pure_ecdh(key,peer_key,file,type):
+    if(file==''):
+        file='shared_key'
+    with open(file,'wb') as fd:
+        fd.write(get_ecdh(key,peer_key,type))
+    print('Shared key was wrote in',file)
+def ecdh(key,peer_key,file,type,key_length):
+    hkdf=HKDF(hashes.SHA256(),key_length,None,None,default_backend())
+    try:
+        key=hkdf.derive(get_ecdh(key,peer_key,type))
         with open(file,'wb') as fd:
-            fd.write(pkey.exchange(pub))
+            fd.write(key)
         print('Shared key was wrote in',file)
     except FileNotFoundError as e:
         print(e)
